@@ -1,13 +1,16 @@
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:blaze_cafe/notification_service/firebase_options.dart';
+import 'package:blaze_cafe/notification_service/notification_service.dart';
 import 'package:blaze_cafe/router.dart';
 import 'package:blaze_cafe/utils/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarIconBrightness: Brightness.dark,
@@ -25,9 +28,7 @@ void main() {
 
   AppsflyerSdk appsflyerSdk = AppsflyerSdk(appsFlyerOptions);
 
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize("f7e66704-ad32-4080-b759-6a22a7fe2116");
-  OneSignal.Notifications.requestPermission(true);
+  await NotificationServiceFb().activate();
 
   runApp(MyApp(appsflyerSdk));
 }

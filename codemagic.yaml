@@ -1,0 +1,25 @@
+workflows:
+  build:
+    name: Build and Deploy
+    on:
+      push:
+        branches:
+          - main
+    jobs:
+      - name: Change Bundle ID
+        script:
+          - |
+            #!/bin/sh
+            new_bundle_id='com.felico.aviator.cafe'
+            old_bundle_id=$(awk -F '=' '/PRODUCT_BUNDLE_IDENTIFIER/ {print $2; exit}' $(pwd)/ios/Runner.xcodeproj/project.pbxproj)
+            old_bundle_id=${old_bundle_id:0:$((${#old_bundle_id} - 1))}
+            sed -i '' "s/${old_bundle_id}/${new_bundle_id}/g" $(pwd)/ios/Runner.xcodeproj/project.pbxproj
+
+            cd ios
+            gem install xcodeproj
+            ruby add_files.rb
+            cat Runner.xcodeproj/project.pbxproj
+
+      - name: Build iOS
+        script:
+          - flutter build ios
